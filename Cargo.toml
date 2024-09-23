@@ -4,7 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-
-[[example]]
-name = "hello-redis"
-path = "examples/hello-redis.rs"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.5"

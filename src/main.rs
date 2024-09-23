@@ -9,11 +9,18 @@ mod cluster;
 mod transactions;
 mod pubsub;
 
-use crate::network::server::Server;
 use crate::config::Config;
 
-fn main() {
-    let config = Config::new();
-    let server = Server::new(config);
-    server.run();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config = match Config::from_file("config.toml") {
+        Ok(config) => config,
+        Err(e) => {
+            eprintln!("Failed to load config, using default: {}", e);
+            Config::new()
+        }
+    };
+
+    println!("Configuration loaded: {:?}", config);
+
+    Ok(())
 }
