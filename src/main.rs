@@ -9,6 +9,7 @@ mod cluster;
 mod transactions;
 mod pubsub;
 
+use crate::network::server::Server;
 use crate::config::Config;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,7 +21,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    println!("Configuration loaded: {:?}", config);
+    let server = Server::new(config);
+    server.run()?;
 
     Ok(())
 }

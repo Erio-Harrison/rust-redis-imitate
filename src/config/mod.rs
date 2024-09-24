@@ -1,16 +1,14 @@
 use std::fs;
 use std::io;
-use serde::de::Error;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug,Clone, Deserialize, Serialize)]
 pub struct Config {
     pub host: String,
     pub port: u16,
     pub max_connections: usize,
     pub max_memory: usize,
 }
-
 
 impl Config{
     pub fn new() -> Self{
