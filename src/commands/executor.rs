@@ -59,7 +59,7 @@ impl CommandExecutor {
                 storage.llen(&key).to_string()
             }
             Command::Multi =>{
-                storage.start_trasaction();
+                storage.start_transaction();
                 "OK".to_string()
             },
             Command::Exec => {
@@ -124,7 +124,7 @@ impl CommandExecutor {
                     storage.llen(&key).to_string()
                 }
                 Command::Multi =>{
-                    storage.start_trasaction();
+                    storage.start_transaction();
                     "OK".to_string()
                 },
                 Command::Exec => {
