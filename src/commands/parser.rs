@@ -1,4 +1,4 @@
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum Command {
     Set(String, String),
     Get(String),
@@ -10,6 +10,9 @@ pub enum Command {
     LPop(String),
     RPop(String),
     LLen(String),
+    Multi,
+    Exec,
+    Discard,
     Unknown(String),
 }
 pub struct CommandParser;
@@ -28,6 +31,9 @@ impl CommandParser {
             ["LPOP", key] => Command::LPop(key.to_string()),
             ["RPOP", key] => Command::RPop(key.to_string()),
             ["LLEN", key] => Command::LLen(key.to_string()),
+            ["MULTI"] => Command::Multi,
+            ["EXEC"] => Command::Exec,
+            ["DISCARD"] => Command::Discard,
             [command, ..] => Command::Unknown(command.to_string()),
             _ => Command::Unknown("".to_string()),
         }

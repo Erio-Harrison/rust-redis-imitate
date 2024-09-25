@@ -3,6 +3,8 @@ use std::collections::{HashMap, VecDeque};
 pub struct MemoryStorage {
     strings: HashMap<String, String>,
     lists: HashMap<String, VecDeque<String>>,
+    transaction_strings: Option<HashMap<String, String>>,
+    transaction_lists: Option<HashMap<String, VecDeque<String>>>,
 }
 
 impl MemoryStorage {
@@ -10,7 +12,28 @@ impl MemoryStorage {
         MemoryStorage {
             strings: HashMap::new(),
             lists: HashMap::new(),
+            transaction_strings: None,
+            transaction_lists: None,
         }
+    }
+
+    pub fn start_trasaction(&mut self){
+        self.transaction_strings = Some(self.strings.clone());
+        self.transaction_lists = Some(self.lists.clone());
+    }
+
+    pub fn commit_transaction(&mut self) {
+        if let Some(strings) = self.transaction_strings.take() {
+            self.strings = strings;
+        }
+        if let Some(lists) = self.transaction_lists.take() {
+            self.lists = lists;
+        }
+    }
+
+    pub fn rollback_transaction(&mut self) {
+        self.transaction_strings = None;
+        self.transaction_lists = None;
     }
 
     pub fn set(&mut self, key: String, value: String) {
