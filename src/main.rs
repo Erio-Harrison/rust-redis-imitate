@@ -3,10 +3,6 @@ mod commands;
 mod storage;
 mod cache;
 mod config;
-mod logging;
-mod monitoring;
-mod cluster;
-mod pubsub;
 
 use std::sync::{Arc, Mutex};
 
