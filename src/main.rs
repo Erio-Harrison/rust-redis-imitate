@@ -6,7 +6,6 @@ mod config;
 mod logging;
 mod monitoring;
 mod cluster;
-mod transactions;
 mod pubsub;
 
 use std::sync::{Arc, Mutex};
