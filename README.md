@@ -2,6 +2,8 @@
 
 A Redis clone implemented in Rust, featuring a modular architecture with core and advanced functionalities such as networking, command processing, data storage, caching, clustering, transactions, and pub/sub. The project also includes robust configuration, logging, monitoring systems, and tools for testing and benchmarking.
 
+Now support commands:"SET","GET","DEL","INCR","DECR","LPUSH","RPUSH","LPOP","RPOP","LLEN","MULTI","EXEC","DISCARD". Will add new commands in the future.
+
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -88,7 +90,7 @@ cd rust-redis-client
 cargo run
 ```
 
-Then you could see:
+Let's try some commands:
 
 ![result](asset/output.png)
 
