@@ -19,22 +19,24 @@ pub struct CommandParser;
 
 impl CommandParser {
     pub fn parse(input: &str) -> Command {
-        let parts: Vec<&str> = input.trim().splitn(3, ' ').collect();
+        let parts: Vec<&str> = input.trim().split_whitespace().collect();
         match parts.as_slice() {
-            ["SET", key, value] => Command::Set(key.to_string(), value.to_string()),
-            ["GET", key] => Command::Get(key.to_string()),
-            ["DEL", key] => Command::Del(key.to_string()),
-            ["INCR", key] => Command::Incr(key.to_string()),
-            ["DECR", key] => Command::Decr(key.to_string()),
-            ["LPUSH", key, value] => Command::LPush(key.to_string(), value.to_string()),
-            ["RPUSH", key, value] => Command::RPush(key.to_string(), value.to_string()),
-            ["LPOP", key] => Command::LPop(key.to_string()),
-            ["RPOP", key] => Command::RPop(key.to_string()),
-            ["LLEN", key] => Command::LLen(key.to_string()),
-            ["MULTI"] => Command::Multi,
-            ["EXEC"] => Command::Exec,
-            ["DISCARD"] => Command::Discard,
-            [command, ..] => Command::Unknown(command.to_string()),
+            [command, rest @ ..] => match command.to_uppercase().as_str() {
+                "SET" if rest.len() == 2 => Command::Set(rest[0].to_lowercase(), rest[1].to_string()),
+                "GET" if rest.len() == 1 => Command::Get(rest[0].to_lowercase()),
+                "DEL" if rest.len() == 1 => Command::Del(rest[0].to_lowercase()),
+                "INCR" if rest.len() == 1 => Command::Incr(rest[0].to_lowercase()),
+                "DECR" if rest.len() == 1 => Command::Decr(rest[0].to_lowercase()),
+                "LPUSH" if rest.len() == 2 => Command::LPush(rest[0].to_lowercase(), rest[1].to_string()),
+                "RPUSH" if rest.len() == 2 => Command::RPush(rest[0].to_lowercase(), rest[1].to_string()),
+                "LPOP" if rest.len() == 1 => Command::LPop(rest[0].to_lowercase()),
+                "RPOP" if rest.len() == 1 => Command::RPop(rest[0].to_lowercase()),
+                "LLEN" if rest.len() == 1 => Command::LLen(rest[0].to_lowercase()),
+                "MULTI" if rest.is_empty() => Command::Multi,
+                "EXEC" if rest.is_empty() => Command::Exec,
+                "DISCARD" if rest.is_empty() => Command::Discard,
+                _ => Command::Unknown(input.to_string()),
+            },
             _ => Command::Unknown("".to_string()),
         }
     }

@@ -18,58 +18,69 @@ impl CommandExecutor {
             Command::Set(key, value) => {
                 storage.set(key, value);
                 "OK".to_string()
-            }
+            },
             Command::Get(key) => {
                 match storage.get(&key) {
                     Some(value) => value.clone(),
                     None => "(nil)".to_string(),
                 }
-            }
+            },
             Command::Del(key) => {
                 match storage.del(&key) {
                     true => "1".to_string(),
                     false => "0".to_string(),
                 }
-            }
+            },
             Command::Incr(key) => {
                 storage.incr(&key).to_string()
-            }
+            },
             Command::Decr(key) => {
                 storage.decr(&key).to_string()
-            }
+            },
             Command::LPush(key, value) => {
                 storage.lpush(&key, value).to_string()
-            }
+            },
             Command::RPush(key, value) => {
                 storage.rpush(&key, value).to_string()
-            }
+            },
             Command::LPop(key) => {
                 match storage.lpop(&key) {
                     Some(value) => value,
                     None => "(nil)".to_string(),
                 }
-            }
+            },
             Command::RPop(key) => {
                 match storage.rpop(&key) {
                     Some(value) => value,
                     None => "(nil)".to_string(),
                 }
-            }
+            },
             Command::LLen(key) => {
                 storage.llen(&key).to_string()
-            }
+            },
             Command::Multi =>{
                 storage.start_transaction();
                 "OK".to_string()
             },
             Command::Exec => {
-                storage.commit_transaction();
-                "OK".to_string()
+                match storage.commit_transaction() {
+                    Ok(results) => {
+                        let mut response = String::new();
+                        for result in results {
+                            response.push_str(&format!("{}\n", result));
+                        }
+                        response.push_str("OK\n");
+                        response
+                    },
+                    Err(e) => format!("ERR: {}\n", e),
+                }
             },
-            Command::Discard =>{
-                storage.rollback_transaction();
-                "OK".to_string()
-            }, 
+            Command::Discard => {
+                match storage.rollback_transaction() {
+                    Ok(_) => "OK".to_string(),
+                    Err(e) => format!("ERR: {}", e),
+                }
+            },
             Command::Unknown(cmd) => format!("ERR unknown command '{}'", cmd),
         }
     }
@@ -83,60 +94,70 @@ impl CommandExecutor {
                 Command::Set(key, value) => {
                     storage.set(key.to_string(), value.to_string());
                     "OK".to_string()
-                }
+                },
                 Command::Get(key) => {
                     match storage.get(&key) {
                         Some(value) => value.clone(),
                         None => "(nil)".to_string(),
                     }
-                }
+                },
                 Command::Del(key) => {
                     match storage.del(&key) {
                         true => "1".to_string(),
                         false => "0".to_string(),
                     }
-                }
+                },
                 Command::Incr(key) => {
                     storage.incr(&key).to_string()
-                }
+                },
                 Command::Decr(key) => {
                     storage.decr(&key).to_string()
-                }
+                },
                 Command::LPush(key, value) => {
                     storage.lpush(&key, value.to_string()).to_string()
-                }
+                },
                 Command::RPush(key, value) => {
                     storage.rpush(&key, value.to_string()).to_string()
-                }
+                },
                 Command::LPop(key) => {
                     match storage.lpop(&key) {
                         Some(value) => value,
                         None => "(nil)".to_string(),
                     }
-                }
+                },
                 Command::RPop(key) => {
                     match storage.rpop(&key) {
                         Some(value) => value,
                         None => "(nil)".to_string(),
                     }
-                }
+                },
                 Command::LLen(key) => {
                     storage.llen(&key).to_string()
-                }
+                },
                 Command::Multi =>{
                     storage.start_transaction();
                     "OK".to_string()
                 },
                 Command::Exec => {
-                    storage.commit_transaction();
-                    "OK".to_string()
+                    match storage.commit_transaction() {
+                        Ok(results) => {
+                            let mut response = String::new();
+                            for result in results {
+                                response.push_str(&format!("{}\n", result));
+                            }
+                            response.push_str("OK\n");
+                            response
+                        },
+                        Err(e) => format!("ERR: {}\n", e),
+                    }
                 },
-                Command::Discard =>{
-                    storage.rollback_transaction();
-                    "OK".to_string()
-                }, 
+                Command::Discard => {
+                    match storage.rollback_transaction() {
+                        Ok(_) => "OK".to_string(),
+                        Err(e) => format!("ERR: {}", e),
+                    }
+                },
                 Command::Unknown(cmd) => format!("ERR unknown command '{}'", cmd),
-                _ => unreachable!(),
             
             };
             results.push(result);

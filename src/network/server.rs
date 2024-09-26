@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::config::config::Config;
 use crate::network::connection::Connection;
 use crate::commands::executor::CommandExecutor;
 use crate::storage::memory::MemoryStorage;
@@ -9,7 +9,7 @@ use threadpool::ThreadPool;
 use std::sync::{Arc, Mutex};
 
 pub struct Server {
-    config: Arc<Config>,
+    pub config: Arc<Config>,
     thread_pool: ThreadPool,
     storage: Arc<Mutex<MemoryStorage>>,
 }
@@ -30,11 +30,10 @@ impl Server {
         for stream in listener.incoming() {
             match stream {
                 Ok(stream) => {
-                    let config = Arc::clone(&self.config);
                     let storage = Arc::clone(&self.storage);
                     self.thread_pool.execute(move || {
                         let executor = Arc::new(CommandExecutor::new(storage));
-                        if let Err(e) = handle_client(stream, config, executor) {
+                        if let Err(e) = handle_client(stream,  executor) {
                             eprintln!("Error handling client: {}", e);
                         }
                     });
@@ -47,7 +46,7 @@ impl Server {
     }
 }
 
-fn handle_client(stream: TcpStream, config: Arc<Config>, executor: Arc<CommandExecutor>) -> io::Result<()> {
-    let mut connection = Connection::new(stream, config, executor);
+fn handle_client(stream: TcpStream, executor: Arc<CommandExecutor>) -> io::Result<()> {
+    let mut connection = Connection::new(stream,  executor);
     connection.process()
 }

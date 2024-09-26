@@ -1,4 +1,3 @@
-use crate::config::Config;
 use std::collections::VecDeque;
 use crate::commands::parser::{Command, CommandParser};
 use crate::commands::executor::CommandExecutor;
@@ -6,19 +5,16 @@ use std::net::TcpStream;
 use std::io::{self, BufRead, BufReader, Write};
 use std::sync::Arc;
 
-
 pub struct Connection {
     stream: BufReader<TcpStream>,
-    config: Arc<Config>,
     executor: Arc<CommandExecutor>,
     transaction_stack: VecDeque<Vec<Command>>,
 }
 
 impl Connection {
-    pub fn new(stream: TcpStream, config: Arc<Config>, executor: Arc<CommandExecutor>) -> Self {
+    pub fn new(stream: TcpStream, executor: Arc<CommandExecutor>) -> Self {
         Connection {
             stream: BufReader::new(stream),
-            config,
             executor,
             transaction_stack: VecDeque::new(),
         }
@@ -29,14 +25,19 @@ impl Connection {
             let mut command = String::new();
             let bytes_read = self.stream.read_line(&mut command)?;
             if bytes_read == 0 {
+                println!("Client disconnected");
                 return Ok(());
             }
-
+            println!("Received command: {}", command.trim());
             let parsed_command = CommandParser::parse(&command);
             let response = self.handle_command(parsed_command);
-
-            self.stream.get_mut().write_all(response.as_bytes())?;
-            self.stream.get_mut().write_all(b"\r\n")?;
+            
+            println!("Sending response: {}", response);
+            for line in response.lines(){
+                self.stream.get_mut().write_all(line.as_bytes())?;
+                self.stream.get_mut().write_all(b"\r\n")?;
+            }
+            self.stream.get_mut().flush()?;
         }
     }
 
