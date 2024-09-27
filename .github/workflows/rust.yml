@@ -1,0 +1,44 @@
+name: Rust CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
+    - name: Run clippy
+      run: cargo clippy -- -D warnings
+    - name: Check formatting
+      run: cargo fmt -- --check
+
+
+  #deploy:
+  #  needs: build
+  #  runs-on: ubuntu-latest
+  #  if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Build
+  #    run: cargo build --release
+  #  - name: Deploy
+  #    env:
+  #      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+  #      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+  #      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+  #    run: |
+  #      echo "$DEPLOY_SSH_KEY" > deploy_key
+  #      chmod 600 deploy_key
+  #      scp -i deploy_key -o StrictHostKeyChecking=no target/release/redis_clone $DEPLOY_USER@$DEPLOY_HOST:/path/to/deploy/directory/
+  #      ssh -i deploy_key -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST 'systemctl restart redis_clone'
