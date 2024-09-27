@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "rust-client"
+name = "rust-redis-client"
 version = "0.1.0"

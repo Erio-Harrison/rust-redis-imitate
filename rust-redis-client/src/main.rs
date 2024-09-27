@@ -47,7 +47,7 @@ impl RedisClient {
 }
 
 fn main() -> io::Result<()> {
-    let mut client = RedisClient::new("127.0.0.1:6379")?;
+    let mut client = RedisClient::new("170.64.237.20:6379")?;
     println!("Connected to Redis server. Type 'quit' to exit.");
 
     loop {
