@@ -2,6 +2,8 @@ use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
 use std::fs::File;
 use std::io::{self, BufWriter, BufReader, Write, BufRead};
+use crate::cache::avlcache::AVLCache;
+use std::time::Duration;
 
 #[derive(Clone)]
 struct TransactionLayer {
@@ -13,6 +15,7 @@ pub struct MemoryStorage {
     strings: Arc<HashMap<String, String>>,
     lists: Arc<HashMap<String, VecDeque<String>>>,
     transaction_stack: Vec<TransactionLayer>,
+    cache: AVLCache<String,String>,
 }
 
 impl MemoryStorage {
@@ -21,6 +24,7 @@ impl MemoryStorage {
             strings: Arc::new(HashMap::new()),
             lists: Arc::new(HashMap::new()),
             transaction_stack: Vec::new(),
+            cache: AVLCache::new(1000, Duration::from_secs(300)),
         }
     }
 
@@ -138,7 +142,8 @@ impl MemoryStorage {
                 results.push("QUEUED".to_string());
             }
         }
-    
+        
+        self.cache.clear();
         Ok(results)
     }
 
@@ -153,32 +158,46 @@ impl MemoryStorage {
     pub fn set(&mut self, key: String, value: String) {
         let key = key.to_lowercase();
         if let Some(layer) = self.transaction_stack.last_mut() {
-            layer.strings.insert(key, Some(value));
+            layer.strings.insert(key.clone(), Some(value.clone()));
         } else {
-            Arc::make_mut(&mut self.strings).insert(key, value);
+            Arc::make_mut(&mut self.strings).insert(key.clone(), value.clone());
         }
+        self.cache.put(key, value);
     }
 
-    pub fn get(&self, key: &str) -> Option<String> {
+    pub fn get(&mut self, key: &str) -> Option<String> {
         let key = key.to_lowercase();
-        for layer in self.transaction_stack.iter().rev() {
-            if let Some(value_opt) = layer.strings.get(&key) {
-                return value_opt.clone();
-            }
+        
+        if let Some(value) = self.cache.get(&key) {
+            return Some(value);
         }
-        self.strings.get(&key).cloned()
+    
+        let result = self.transaction_stack.iter().rev()
+            .find_map(|layer| layer.strings.get(&key).cloned().flatten())
+            .or_else(|| self.strings.get(&key).cloned());
+    
+        if let Some(value) = result.as_ref() {
+            self.cache.put(key.clone(), value.clone());
+        }
+    
+        result
     }
 
     pub fn del(&mut self, key: &str) -> bool {
         let key = key.to_lowercase();
-        if let Some(layer) = self.transaction_stack.last_mut() {
+        let result = if let Some(layer) = self.transaction_stack.last_mut() {
             layer.strings.insert(key.to_string(), None);
             layer.lists.insert(key.to_string(), None);
             true
         } else {
             Arc::make_mut(&mut self.strings).remove(&key).is_some() ||
             Arc::make_mut(&mut self.lists).remove(&key).is_some()
+        };
+        if result {
+            self.cache.remove(&key);
         }
+
+        result
     }
 
     pub fn incr(&mut self, key: &str) -> i64 {
