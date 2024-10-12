@@ -152,6 +152,7 @@ impl MemoryStorage {
             return Err("No active transaction to rollback".to_string());
         }
         self.transaction_stack.pop();
+        self.cache.clear();
         Ok(())
     }
 
