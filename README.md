@@ -39,11 +39,11 @@ Manages in-memory data structures and persistent storage.
   - HashMap, List, Set, and other Redis-like data structures
   - Persistence through RDB and AOF mechanisms
 
-### 4. Cache Module (`cache`)（TODO）
+### 4. Cache Module (`cache`)
 Implements caching strategies and handles expired keys.
 - **Features**:
+  - AVL Tree structure
   - LRU/LFU caching algorithms
-  - Expiration management for keys
 
 ## Auxiliary Modules
 
@@ -69,7 +69,7 @@ Manages channels and message distribution for Redis's pub/sub feature.
 
 ## Tools and Testing
 
-### 1. Benchmarking (`benchmarks`)（TODO）
+### 1. Benchmarking (`benchmarks`)
 Includes a performance testing suite to evaluate system efficiency.
 
 ### 2. Unit and Integration Testing
