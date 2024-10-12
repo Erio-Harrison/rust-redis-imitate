@@ -13,3 +13,8 @@ toml = "0.5"
 threadpool = "1.8"
 uuid = { version = "1.2", features = ["v4"] }
 serde_json = "1.0"
+criterion = "0.3"
+
+[[bench]]
+name = "redis_benchmark"
+harness = false
