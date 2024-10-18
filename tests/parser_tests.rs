@@ -157,4 +157,86 @@ mod tests {
             Command::Unknown("INCR key value".to_string())
         );
     }
+
+    #[test]
+    fn test_command_with_special_characters() {
+        assert_eq!(
+            CommandParser::parse("SET mykey !@#$%^&*()"),
+            Command::Set("mykey".to_string(), "!@#$%^&*()".to_string())
+        );
+    }
+
+    #[test]
+    fn test_command_with_unicode() {
+        assert_eq!(
+            CommandParser::parse("SET mykey 你好世界"),
+            Command::Set("mykey".to_string(), "你好世界".to_string())
+        );
+    }
+
+    #[test]
+    fn test_command_with_very_long_key() {
+        let long_key = "a".repeat(1024);
+        assert_eq!(
+            CommandParser::parse(&format!("GET {}", long_key)),
+            Command::Get(long_key)
+        );
+    }
+
+    #[test]
+    fn test_command_with_very_long_value() {
+        let long_value = "a".repeat(1024 * 1024); // 1MB value
+        assert_eq!(
+            CommandParser::parse(&format!("SET mykey {}", long_value)),
+            Command::Set("mykey".to_string(), long_value)
+        );
+    }
+
+    #[test]
+    fn test_command_with_leading_trailing_whitespace() {
+        assert_eq!(
+            CommandParser::parse("  \t  SET   mykey   myvalue  \n  "),
+            Command::Set("mykey".to_string(), "myvalue".to_string())
+        );
+    }
+
+    #[test]
+    fn test_command_case_mixing() {
+        assert_eq!(
+            CommandParser::parse("sEt MyKeY MyVaLuE"),
+            Command::Set("mykey".to_string(), "MyVaLuE".to_string())
+        );
+    }
+
+    #[test]
+    fn test_command_with_empty_value() {
+        assert_eq!(
+            CommandParser::parse("SET mykey "),
+            Command::Unknown("SET mykey ".to_string())
+        );
+    }
+
+    #[test]
+    fn test_command_with_multiple_spaces_between_args() {
+        assert_eq!(
+            CommandParser::parse("LPUSH    mylist    value"),
+            Command::LPush("mylist".to_string(), "value".to_string())
+        );
+    }
+
+    #[test]
+    fn test_unknown_command_with_args() {
+        assert_eq!(
+            CommandParser::parse("UNKNOWN_CMD arg1 arg2"),
+            Command::Unknown("UNKNOWN_CMD arg1 arg2".to_string())
+        );
+    }
+
+    #[test]
+    fn test_partial_known_command() {
+        assert_eq!(
+            CommandParser::parse("SE"),
+            Command::Unknown("SE".to_string())
+        );
+    }    
 }
