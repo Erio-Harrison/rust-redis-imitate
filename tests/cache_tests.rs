@@ -74,4 +74,34 @@ mod tests {
 
         assert_eq!(cache.get(&"key1".to_string()), Some(2));
     }
+
+    #[test]
+    fn test_large_capacity() {
+        let mut cache = AVLCache::new(1_000_000, Duration::from_secs(60));
+        for i in 0..1_000_000 {
+            cache.put(format!("key{}", i), i);
+        }
+        assert_eq!(cache.get(&"key999999".to_string()), Some(999999));
+        cache.put("new_key".to_string(), 1_000_000);
+        assert_eq!(cache.get(&"key0".to_string()), None);
+    }
+
+    #[test]
+    fn test_zero_ttl() {
+        let mut cache = AVLCache::new(5, Duration::from_secs(0));
+        cache.put("key1".to_string(), 1);
+        assert_eq!(cache.get(&"key1".to_string()), None);
+    }
+
+    #[test]
+    fn test_update_resets_ttl() {
+        let mut cache = AVLCache::new(5, Duration::from_millis(200));
+        cache.put("key1".to_string(), 1);
+
+        std::thread::sleep(Duration::from_millis(150));
+        cache.put("key1".to_string(), 2);
+
+        std::thread::sleep(Duration::from_millis(100));
+        assert_eq!(cache.get(&"key1".to_string()), Some(2));
+    }
 }
