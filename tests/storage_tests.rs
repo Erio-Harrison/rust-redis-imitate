@@ -104,4 +104,60 @@ mod tests {
         storage.rollback_transaction().unwrap();
         assert_eq!(storage.get("key4"), None);
     }
+
+    #[test]
+    fn test_empty_string_key_and_value() {
+        let mut storage = MemoryStorage::new();
+
+        storage.set("".to_string(), "empty_key".to_string());
+        assert_eq!(storage.get(""), Some("empty_key".to_string()));
+
+        storage.set("empty_value".to_string(), "".to_string());
+        assert_eq!(storage.get("empty_value"), Some("".to_string()));
+    }
+
+    #[test]
+    fn test_list_operations_edge_cases() {
+        let mut storage = MemoryStorage::new();
+
+        for i in 0..1000000 {
+            storage.rpush("large_list", i.to_string());
+        }
+        assert_eq!(storage.llen("large_list"), 1000000);
+
+        storage.lpush("multi_list", "item1".to_string());
+        storage.lpush("multi_list", "item2".to_string());
+        storage.rpush("multi_list", "item3".to_string());
+        storage.rpush("multi_list", "item4".to_string());
+
+        assert_eq!(storage.llen("multi_list"), 4);
+        assert_eq!(storage.lpop("multi_list"), Some("item2".to_string()));
+        assert_eq!(storage.rpop("multi_list"), Some("item4".to_string()));
+    }
+
+    #[test]
+    fn test_nested_transactions() {
+        let mut storage = MemoryStorage::new();
+
+        storage.start_transaction();
+        storage.set("key1".to_string(), "value1".to_string());
+        
+        storage.start_transaction();
+        storage.set("key2".to_string(), "value2".to_string());
+        
+        storage.start_transaction();
+        storage.set("key3".to_string(), "value3".to_string());
+        storage.rollback_transaction().unwrap();
+        
+        let inner_results = storage.commit_transaction().unwrap();
+        assert_eq!(inner_results, vec!["QUEUED".to_string()]);
+        
+        let outer_results = storage.commit_transaction().unwrap();
+        assert_eq!(outer_results, vec!["OK".to_string(), "OK".to_string()]);
+
+        assert_eq!(storage.get("key1"), Some("value1".to_string()));
+        assert_eq!(storage.get("key2"), Some("value2".to_string()));
+        assert_eq!(storage.get("key3"), None);
+    }
+
 }
