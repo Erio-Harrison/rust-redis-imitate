@@ -94,8 +94,6 @@ Let's try some commands:
 
 ![result](asset/output.png)
 
-I plan to bring this project online.(TODO)
-
 
 ## Contributing
 
