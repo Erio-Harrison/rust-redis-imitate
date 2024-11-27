@@ -52,7 +52,7 @@ mod tests {
 
     #[test]
     fn test_nested_transactions() {
-        let (mut connection, mut client) = setup_connection();
+        let (mut connection, client) = setup_connection();
         
         let handle = thread::spawn(move || {
             connection.process().unwrap();
@@ -97,7 +97,7 @@ mod tests {
 
     #[test]
     fn test_transaction_discard() {
-        let (mut connection, mut client) = setup_connection();
+        let (mut connection, client) = setup_connection();
         
         let handle = thread::spawn(move || {
             connection.process().unwrap();
@@ -136,7 +136,7 @@ mod tests {
 
     #[test]
     fn test_invalid_transaction_commands() {
-        let (mut connection, mut client) = setup_connection();
+        let (mut connection, client) = setup_connection();
         
         let handle = thread::spawn(move || {
             connection.process().unwrap();
