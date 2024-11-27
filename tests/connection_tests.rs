@@ -1,14 +1,14 @@
 use redis_clone::network::connection::Connection;
 use redis_clone::commands::executor::CommandExecutor;
 use redis_clone::storage::memory::MemoryStorage;
+use std::io::{BufRead, BufReader, Write};
+use std::net::{TcpListener, TcpStream};
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::{BufRead, BufReader, Write};
-    use std::net::{TcpListener, TcpStream};
-    use std::sync::{Arc, Mutex};
-    use std::thread;
 
     // Helper function to create a mock connection
     fn setup_connection() -> (Connection, TcpStream) {
