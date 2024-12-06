@@ -1,4 +1,4 @@
-# Rust Redis Clone
+# Rust Redis Imitate
 
 A Redis clone implemented in Rust, featuring a modular architecture with core and advanced functionalities such as networking, command processing, data storage, caching, clustering, transactions, and pub/sub. The project also includes robust configuration, logging, monitoring systems, and tools for testing and benchmarking.
 
