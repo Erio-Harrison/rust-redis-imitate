@@ -6,7 +6,7 @@ A Redis clone implemented in Rust, featuring a modular architecture with core an
 
 Now support commands:"SET","GET","DEL","INCR","DECR","LPUSH","RPUSH","LPOP","RPOP","LLEN","MULTI","EXEC","DISCARD". Will add new commands in the future.
 
-You can check the document here: ![Document](https://erio-harrison.github.io/rust-redis-imitate/)
+You can check the document here: [Document](https://erio-harrison.github.io/rust-redis-imitate/)
 
 ## Table of Contents
 
