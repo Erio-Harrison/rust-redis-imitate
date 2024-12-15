@@ -1,6 +1,18 @@
+//! # AVL Cache Implementation
+//! 
+//! This module provides an AVL tree-based cache implementation with the following features:
+//! - Time-based expiration (TTL)
+//! - Least Recently Used (LRU) eviction
+//! - O(log n) time complexity for all operations
+//! - Automatic rebalancing to maintain performance
+
 use std::cmp::Ordering;
 use std::time::{Duration, Instant};
 
+/// A node in the AVL tree
+/// 
+/// Stores the key-value pair, along with tree-specific metadata like height
+/// and child pointers, plus a timestamp for TTL tracking.
 struct Node<K: Ord + Clone, V> {
     key: K,
     value: V,
@@ -18,6 +30,7 @@ pub struct AVLCache<K: Ord + Clone, V: Clone> {
 }
 
 impl<K: Ord + Clone, V> Node<K, V> {
+    /// Creates a new node with the given key and value
     fn new(key: K, value: V) -> Self {
         Node {
             key,
@@ -29,16 +42,22 @@ impl<K: Ord + Clone, V> Node<K, V> {
         }
     }
 
+    /// Returns the height of this node
     fn height(&self) -> i32 {
         self.height
     }
 
+    /// Calculates the balance factor of this node
+    /// 
+    /// Returns the difference between left and right subtree heights.
+    /// A positive value means left-heavy, negative means right-heavy.
     fn balance_factor(&self) -> i32 {
         let left_height = self.left.as_ref().map_or(0, |n| n.height());
         let right_height = self.right.as_ref().map_or(0, |n| n.height());
         left_height - right_height
     }
 
+    /// Updates the height of this node based on its children
     fn update_height(&mut self) {
         let left_height = self.left.as_ref().map_or(0, |n| n.height());
         let right_height = self.right.as_ref().map_or(0, |n| n.height());
@@ -47,6 +66,12 @@ impl<K: Ord + Clone, V> Node<K, V> {
 }
 
 impl<K: Ord + Clone, V: Clone> AVLCache<K, V> {
+    /// Creates a new AVL cache with specified capacity and TTL
+    ///
+    /// # Arguments
+    ///
+    /// * `capacity` - Maximum number of items the cache can hold
+    /// * `ttl` - Time-to-live duration for cached items
     pub fn new(capacity: usize, ttl: Duration) -> Self {
         AVLCache {
             root: None,
@@ -56,6 +81,10 @@ impl<K: Ord + Clone, V: Clone> AVLCache<K, V> {
         }
     }
 
+    /// Retrieves a value from the cache by its key
+    ///
+    /// Updates the item's timestamp if found, removes it if expired.
+    /// Returns None if the key doesn't exist or the value has expired.
     pub fn get(&mut self, key: &K) -> Option<V> {
         let now = Instant::now();
         if let Some(node) = self.get_node(key) {
@@ -72,6 +101,10 @@ impl<K: Ord + Clone, V: Clone> AVLCache<K, V> {
         }
     }
 
+    /// Inserts or updates a key-value pair in the cache
+    ///
+    /// If the cache is at capacity, removes the oldest item before insertion.
+    /// Updates the timestamp if the key already exists.
     pub fn put(&mut self, key: K, value: V) {
         let contains_key = self.contains_key(&key);
         if self.size == self.capacity && !contains_key {
@@ -133,6 +166,7 @@ impl<K: Ord + Clone, V: Clone> AVLCache<K, V> {
         None
     }
     
+    /// Removes all items from the cache
     pub fn remove(&mut self, key: &K) -> Option<V> {
         let (new_root, removed_value) = {
             let old_root = self.root.take();
@@ -227,6 +261,7 @@ impl<K: Ord + Clone, V: Clone> AVLCache<K, V> {
         new_root
     }
 
+    /// Returns the key-value pair with the smallest key
     pub fn min(&self) -> Option<(K, V)> {
         fn min_node<K: Ord + Clone, V: Clone>(node: &Node<K, V>) -> (K, V) {
             match &node.left {
@@ -237,6 +272,7 @@ impl<K: Ord + Clone, V: Clone> AVLCache<K, V> {
         self.root.as_ref().map(|node| min_node(node))
     }
 
+    /// Removes all items from the cache
     pub fn clear(&mut self) {
         self.root = None;
         self.size = 0;

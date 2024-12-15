@@ -1,3 +1,11 @@
+//! # Command Parser Module
+//! 
+//! Provides parsing functionality for Redis-like commands, converting string input
+//! into structured command enums. Supports basic key-value operations, list operations,
+//! and transaction commands.
+
+/// Represents all supported Redis-like commands
+
 #[derive(Debug,PartialEq,Clone)]
 pub enum Command {
     Set(String, String),
@@ -15,9 +23,39 @@ pub enum Command {
     Discard,
     Unknown(String),
 }
+
+/// Parser for Redis-like commands
+///
+/// Converts string input into structured Command enums, handling command validation
+/// and argument parsing.
 pub struct CommandParser;
 
 impl CommandParser {
+    /// Parses a command string into a Command enum
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - The command string to parse
+    ///
+    /// # Returns
+    ///
+    /// A Command enum variant representing the parsed command
+    ///
+    /// # Command Format
+    ///
+    /// * SET key value
+    /// * GET key
+    /// * DEL key
+    /// * INCR key
+    /// * DECR key
+    /// * LPUSH key value
+    /// * RPUSH key value
+    /// * LPOP key
+    /// * RPOP key
+    /// * LLEN key
+    /// * MULTI
+    /// * EXEC
+    /// * DISCARD
     pub fn parse(input: &str) -> Command {
         let parts: Vec<&str> = input.trim().split_whitespace().collect();
         match parts.as_slice() {

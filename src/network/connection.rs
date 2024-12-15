@@ -1,3 +1,7 @@
+//! # Connection Module
+//! 
+//! Handles individual client connections, providing command processing,
+//! transaction management, and network communication for the Redis-like server.
 use std::collections::VecDeque;
 use crate::commands::parser::{Command, CommandParser};
 use crate::commands::executor::CommandExecutor;
@@ -5,12 +9,29 @@ use std::net::TcpStream;
 use std::io::{self, BufRead, BufReader, Write};
 use std::sync::Arc;
 
+/// Manages a single client connection and its transaction state
+///
+/// Handles the lifecycle of a client connection, including:
+/// - Command reading and parsing
+/// - Transaction management
+/// - Response writing
+/// - Connection state maintenance
 pub struct Connection {
     stream: BufReader<TcpStream>,
     executor: Arc<CommandExecutor>,
     transaction_stack: VecDeque<Vec<Command>>,
 }
 
+/// Creates a new Connection instance
+///
+/// # Arguments
+///
+/// * `stream` - TCP stream for the client connection
+/// * `executor` - Shared command executor for processing commands
+///
+/// # Returns
+///
+/// A new Connection instance ready to process client commands
 impl Connection {
     pub fn new(stream: TcpStream, executor: Arc<CommandExecutor>) -> Self {
         Connection {
@@ -20,6 +41,19 @@ impl Connection {
         }
     }
 
+   /// Processes client commands in a loop until the connection is closed
+   ///
+   /// # Returns
+   ///
+   /// * `Ok(())` if the connection was closed normally
+   /// * `Err(e)` if an I/O error occurred
+   ///
+   /// # Command Processing Flow
+   ///
+   /// 1. Reads command from client
+   /// 2. Parses the command
+   /// 3. Handles the command (including transaction management)
+   /// 4. Writes response back to client
     pub fn process(&mut self) -> io::Result<()> {
         loop {
             let mut command = String::new();
@@ -41,6 +75,22 @@ impl Connection {
         }
     }
 
+   /// Handles a single command, managing transaction state as needed
+   ///
+   /// # Arguments
+   ///
+   /// * `command` - The parsed command to handle
+   ///
+   /// # Returns
+   ///
+   /// A string response to send back to the client
+   ///
+   /// # Transaction Handling
+   ///
+   /// * MULTI - Starts a new transaction
+   /// * EXEC - Executes the current transaction
+   /// * DISCARD - Discards the current transaction
+   /// * Other commands - Queued if in transaction, executed immediately otherwise
     fn handle_command(&mut self, command: Command) -> String {
         match command {
             Command::Multi => {
