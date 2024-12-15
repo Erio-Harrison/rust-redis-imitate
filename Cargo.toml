@@ -1,5 +1,5 @@
 [package]
-name = "rust-redis-clone"
+name = "rust-redis-imitate"
 version = "0.1.0"
 edition = "2021"
 
