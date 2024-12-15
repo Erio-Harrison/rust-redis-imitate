@@ -2,6 +2,11 @@
 name = "rust-redis-imitate"
 version = "0.1.0"
 edition = "2021"
+description = "A Redis-like in-memory cache implementation in Rust"
+license = "MIT"
+repository = "https://github.com/Erio-Harrison/rust-redis-imitate"
+keywords = ["redis", "cache", "database", "memory-cache"]
+categories = ["database", "caching"]
 
 [lib]
 name = "redis_imitate"
