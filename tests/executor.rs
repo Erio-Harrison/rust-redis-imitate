@@ -1,6 +1,6 @@
-use redis_clone::storage::memory::MemoryStorage;
-use redis_clone::commands::executor::CommandExecutor;
-use redis_clone::commands::parser::Command;
+use redis_imitate::storage::memory::MemoryStorage;
+use redis_imitate::commands::executor::CommandExecutor;
+use redis_imitate::commands::parser::Command;
 use std::sync::Arc;
 use std::sync::Mutex;
 

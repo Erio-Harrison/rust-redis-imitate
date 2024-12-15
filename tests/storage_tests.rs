@@ -1,4 +1,4 @@
-use redis_clone::storage::memory::MemoryStorage;
+use redis_imitate::storage::memory::MemoryStorage;
 
 #[cfg(test)]
 mod tests {

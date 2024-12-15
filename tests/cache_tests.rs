@@ -1,4 +1,4 @@
-use redis_clone::cache::avlcache::AVLCache;
+use redis_imitate::cache::avlcache::AVLCache;
 use std::time::Duration;
 
 #[cfg(test)]

@@ -1,4 +1,4 @@
-use redis_clone::commands::parser::{Command,CommandParser};
+use redis_imitate::commands::parser::{Command,CommandParser};
 #[cfg(test)]
 mod tests {
     use super::*;

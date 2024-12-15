@@ -1,7 +1,7 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use redis_clone::storage::memory::MemoryStorage;
-use redis_clone::commands::parser::Command;
-use redis_clone::commands::executor::CommandExecutor;
+use redis_imitate::storage::memory::MemoryStorage;
+use redis_imitate::commands::parser::Command;
+use redis_imitate::commands::executor::CommandExecutor;
 use std::sync::{Arc, Mutex};
 
 fn bench_set(c: &mut Criterion) {

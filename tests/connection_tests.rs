@@ -1,6 +1,6 @@
-use redis_clone::network::connection::Connection;
-use redis_clone::commands::executor::CommandExecutor;
-use redis_clone::storage::memory::MemoryStorage;
+use redis_imitate::network::connection::Connection;
+use redis_imitate::commands::executor::CommandExecutor;
+use redis_imitate::storage::memory::MemoryStorage;
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
