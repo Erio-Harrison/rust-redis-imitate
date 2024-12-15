@@ -1,0 +1,13 @@
+C:\Users\u7541\Desktop\rust-redis-imitate\target\debug\deps\libtoml-c90426d6648b0a4c.rmeta: C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\lib.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\map.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\value.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\datetime.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\ser.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\de.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\tokens.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\macros.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\spanned.rs
+
+C:\Users\u7541\Desktop\rust-redis-imitate\target\debug\deps\toml-c90426d6648b0a4c.d: C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\lib.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\map.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\value.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\datetime.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\ser.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\de.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\tokens.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\macros.rs C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\spanned.rs
+
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\lib.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\map.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\value.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\datetime.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\ser.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\de.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\tokens.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\macros.rs:
+C:\Users\u7541\.cargo\registry\src\index.crates.io-6f17d22bba15001f\toml-0.5.11\src\spanned.rs:
