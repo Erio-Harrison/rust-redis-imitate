@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["cache","commands","config","network","storage"]};
