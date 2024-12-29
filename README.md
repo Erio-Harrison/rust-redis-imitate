@@ -4,7 +4,7 @@
 [![Crates.io](https://img.shields.io/crates/v/rust-redis-imitate.svg)](https://crates.io/crates/rust-redis-imitate)
 [![Documentation](https://docs.rs/rust-redis-imitate/badge.svg)](https://docs.rs/rust-redis-imitate)
 
-A Redis clone implemented in Rust, featuring a modular architecture with core and advanced functionalities such as networking, command processing, data storage, caching, clustering, transactions, and pub/sub. The project also includes robust configuration, logging, monitoring systems, and tools for testing and benchmarking.
+A Redis imitate implemented in Rust, featuring a modular architecture with core and advanced functionalities such as networking, command processing, data storage, caching, clustering, transactions, and pub/sub. The project also includes robust configuration, logging, monitoring systems, and tools for testing and benchmarking.
 
 Now support commands:"SET","GET","DEL","INCR","DECR","LPUSH","RPUSH","LPOP","RPOP","LLEN","MULTI","EXEC","DISCARD". Will add new commands in the future.
 

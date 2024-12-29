@@ -22,17 +22,18 @@ pub struct Connection {
     transaction_stack: VecDeque<Vec<Command>>,
 }
 
-/// Creates a new Connection instance
-///
-/// # Arguments
-///
-/// * `stream` - TCP stream for the client connection
-/// * `executor` - Shared command executor for processing commands
-///
-/// # Returns
-///
-/// A new Connection instance ready to process client commands
 impl Connection {
+
+    /// Creates a new Connection instance
+    ///
+    /// # Arguments
+    ///
+    /// * `stream` - TCP stream for the client connection
+    /// * `executor` - Shared command executor for processing commands
+    ///
+    /// # Returns
+    ///
+    /// A new Connection instance ready to process client commands
     pub fn new(stream: TcpStream, executor: Arc<CommandExecutor>) -> Self {
         Connection {
             stream: BufReader::new(stream),
