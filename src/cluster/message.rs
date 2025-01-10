@@ -57,4 +57,9 @@ pub enum RaftMessage {
         success: bool,
         match_index: u64,
     },
+
+    Heartbeat {
+        term: u64,
+        leader_id: String,
+    },
 }

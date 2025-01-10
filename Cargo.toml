@@ -13,7 +13,9 @@ name = "redis_imitate"
 path = "src/lib.rs"
 
 [dependencies]
+tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
+parking_lot = "0.12"
 toml = "0.5"
 threadpool = "1.8"
 uuid = { version = "1.2", features = ["v4"] }
