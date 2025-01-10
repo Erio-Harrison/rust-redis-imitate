@@ -54,7 +54,7 @@ Implements caching strategies and handles expired keys.
 ### 1. Configuration Module (`config`)
 Handles configuration file parsing and runtime configuration management.
 
-### 2. Logging Module (`logging`)（TODO）
+### 2. Logging Module (`logging`)
 Manages logging for errors and operations.
 
 ### 3. Monitoring Module (`monitoring`)（TODO）
