@@ -1,5 +1,4 @@
 use tokio::net::{TcpListener, TcpStream};
-use tokio::runtime::Runtime;
 use tokio::sync::{mpsc, Mutex};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use std::collections::HashMap;
@@ -11,13 +10,13 @@ use super::error::{RaftError, RaftResult};
 
 pub trait Transport: Send + Sync {
     /// Send message to specified node
-    async fn send(&self, to: &str, msg: RaftMessage) -> RaftResult<()>;
+    fn send(&self, to: &str, msg: RaftMessage) -> impl std::future::Future<Output = RaftResult<()>> + Send;
     /// Start transport service to listen for messages
-    async fn start(&self) -> RaftResult<()>;
+    fn start(&self) -> impl std::future::Future<Output = RaftResult<()>> + Send;
     /// Add a new node to the cluster
-    async fn add_node(&self, node_id: String, addr: String) -> RaftResult<()>;
+    fn add_node(&self, node_id: String, addr: String) -> impl std::future::Future<Output = RaftResult<()>> + Send;
     /// Remove a node from the cluster
-    async fn remove_node(&self, node_id: &str) -> RaftResult<()>;
+    fn remove_node(&self, node_id: &str) -> impl std::future::Future<Output = RaftResult<()>> + Send;
 }
 
 pub struct RaftTransport {

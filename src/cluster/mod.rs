@@ -2,7 +2,7 @@
 pub mod node;
 pub mod message;
 pub mod transport;
-pub mod membership;
+pub mod consensus;
 pub mod log_store;
-pub mod metrics;
+pub mod state;
 pub mod error;
