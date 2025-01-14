@@ -8,6 +8,11 @@ A Redis imitate implemented in Rust, featuring a modular architecture with core 
 
 Now support commands:"SET","GET","DEL","INCR","DECR","LPUSH","RPUSH","LPOP","RPOP","LLEN","MULTI","EXEC","DISCARD". Will add new commands in the future.
 
+If you'd like to discuss more about this project, feel free to join me on Discord for a chat!
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?logo=discord&logoColor=white)](https://discord.gg/8jCKt9rTtN)
+
+
 ## Table of Contents
 
 - [Introduction](#introduction)

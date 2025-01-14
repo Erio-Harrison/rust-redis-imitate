@@ -401,104 +401,104 @@ async fn test_node_startup() {
     assert!(RaftNode::start(node).await.is_ok());
 }
 
-// #[tokio::test]
-// async fn test_process_command() {
-//     let node_id = "node1".to_string();
-//     let transport = Arc::new(MockTransport::new(node_id.clone()));
-//     let log_store = Arc::new(Mutex::new(MockLogStore::new()));
-//     let state_machine = Arc::new(Mutex::new(MockStateMachine::default()));
+#[tokio::test]
+async fn test_process_command() {
+    let node_id = "node1".to_string();
+    let transport = Arc::new(MockTransport::new(node_id.clone()));
+    let log_store = Arc::new(Mutex::new(MockLogStore::new()));
+    let state_machine = Arc::new(Mutex::new(MockStateMachine::default()));
     
-//     let mut cluster = HashMap::new();
-//     cluster.insert(node_id.clone(), "addr1".to_string());
+    let mut cluster = HashMap::new();
+    cluster.insert(node_id.clone(), "addr1".to_string());
     
-//     let node = RaftNode::new(
-//         node_id.clone(),
-//         transport.clone(),
-//         log_store.clone(),
-//         state_machine.clone(),
-//         cluster,
-//         1000,
-//     );
+    let node = RaftNode::new(
+        node_id.clone(),
+        transport.clone(),
+        log_store.clone(),
+        state_machine.clone(),
+        cluster,
+        1000,
+    );
     
-//     // Make node the leader
-//     {
-//         let mut state = node.consensus.state.lock().await;
-//         state.become_leader();
-//     }
+    // Make node the leader
+    {
+        let mut state = node.consensus.state.lock().await;
+        state.become_leader();
+    }
     
-//     // Test SET command
-//     let cmd = Command::new(
-//         "SET".to_string(),
-//         "key1".to_string(),
-//         Some(b"value1".to_vec()),
-//     );
+    // Test SET command
+    let cmd = Command::new(
+        "SET".to_string(),
+        "key1".to_string(),
+        Some(b"value1".to_vec()),
+    );
     
-//     let result = node.process_command(cmd).await;
-//     assert!(result.is_ok());
-//     let response = result.unwrap();
-//     assert!(response.success);
+    let result = node.process_command(cmd).await;
+    assert!(result.is_ok());
+    let response = result.unwrap();
+    assert!(response.success);
     
-//     // Verify log entry was created
-//     let log_store = node.consensus.log_store.lock().await;
-//     assert_eq!(log_store.last_index().unwrap(), 1);
+    // Verify log entry was created
+    let log_store = node.consensus.log_store.lock().await;
+    assert_eq!(log_store.last_index().unwrap(), 1);
     
-//     // Test GET command
-//     let cmd = Command::new(
-//         "GET".to_string(),
-//         "key1".to_string(),
-//         None,
-//     );
+    // Test GET command
+    let cmd = Command::new(
+        "GET".to_string(),
+        "key1".to_string(),
+        None,
+    );
     
-//     let result = node.process_command(cmd).await;
-//     assert!(result.is_ok());
-//     let response = result.unwrap();
-//     assert!(response.success);
-//     assert_eq!(response.data.unwrap(), b"value1");
-// }
+    let result = node.process_command(cmd).await;
+    assert!(result.is_ok());
+    let response = result.unwrap();
+    assert!(response.success);
+    assert_eq!(response.data.unwrap(), b"value1");
+}
 
-// #[tokio::test]
-// async fn test_snapshot_creation() {
-//     let node_id = "node1".to_string();
-//     let transport = Arc::new(MockTransport::new(node_id.clone()));
-//     let log_store = Arc::new(Mutex::new(MockLogStore::new()));
-//     let state_machine = Arc::new(Mutex::new(MockStateMachine::default()));
+#[tokio::test]
+async fn test_snapshot_creation() {
+    let node_id = "node1".to_string();
+    let transport = Arc::new(MockTransport::new(node_id.clone()));
+    let log_store = Arc::new(Mutex::new(MockLogStore::new()));
+    let state_machine = Arc::new(Mutex::new(MockStateMachine::default()));
     
-//     let mut cluster = HashMap::new();
-//     cluster.insert(node_id.clone(), "addr1".to_string());
+    let mut cluster = HashMap::new();
+    cluster.insert(node_id.clone(), "addr1".to_string());
     
-//     let node = RaftNode::new(
-//         node_id.clone(),
-//         transport.clone(),
-//         log_store.clone(),
-//         state_machine.clone(),
-//         cluster,
-//         5, // Low snapshot threshold for testing
-//     );
+    let node = RaftNode::new(
+        node_id.clone(),
+        transport.clone(),
+        log_store.clone(),
+        state_machine.clone(),
+        cluster,
+        5, // Low snapshot threshold for testing
+    );
     
-//     // Make node the leader
-//     {
-//         let mut state = node.consensus.state.lock().await;
-//         state.become_leader();
-//     }
+    // Make node the leader
+    {
+        let mut state = node.consensus.state.lock().await;
+        state.become_leader();
+    }
     
-//     // Create enough entries to trigger snapshot
-//     for i in 0..6 {
-//         let cmd = Command::new(
-//             "SET".to_string(),
-//             format!("key{}", i),
-//             Some(format!("value{}", i).into_bytes()),
-//         );
-//         let result = node.process_command(cmd).await;
-//         assert!(result.is_ok());
-//     }
+    // Create enough entries to trigger snapshot
+    for i in 0..6 {
+        let cmd = Command::new(
+            "SET".to_string(),
+            format!("key{}", i),
+            Some(format!("value{}", i).into_bytes()),
+        );
+        let result = node.process_command(cmd).await;
+        assert!(result.is_ok());
+    }
     
-//     // Wait for snapshot to be created
-//     tokio::time::sleep(Duration::from_secs(2)).await;
+    // Wait for snapshot to be created
+    tokio::time::sleep(Duration::from_secs(2)).await;
     
-//     // Verify snapshot was created
-//     let log_store = node.consensus.log_store.lock().await;
-//     assert!(!log_store.snapshots.is_empty());
-// }
+    // Verify snapshot was created
+    let log_store = node.consensus.log_store.lock().await;
+    assert!(!log_store.snapshots.is_empty());
+}
 
 #[tokio::test]
 async fn test_message_handling() {
