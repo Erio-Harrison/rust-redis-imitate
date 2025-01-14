@@ -10,13 +10,13 @@ use super::transport::Transport;
 use super::log_store::LogStore;
 
 pub struct RaftConsensus<T: Transport + 'static, L: LogStore + 'static> {
-    state: Arc<Mutex<RaftState>>,
-    transport: Arc<T>,
-    log_store: Arc<Mutex<L>>,
-    cluster: Arc<HashMap<String, String>>, // node_id -> address
+    pub state: Arc<Mutex<RaftState>>,
+    pub transport: Arc<T>,
+    pub log_store: Arc<Mutex<L>>,
+    pub cluster: Arc<HashMap<String, String>>, // node_id -> address
     
-    next_index: Arc<Mutex<HashMap<String, u64>>>,   
-    match_index: Arc<Mutex<HashMap<String, u64>>>,  
+    pub next_index: Arc<Mutex<HashMap<String, u64>>>,   
+    pub match_index: Arc<Mutex<HashMap<String, u64>>>,  
 }
 
 impl<T: Transport + 'static, L: LogStore + 'static> RaftConsensus<T, L> {
@@ -165,7 +165,7 @@ impl<T: Transport + 'static, L: LogStore + 'static> RaftConsensus<T, L> {
         Ok(())
     }
 
-    async fn broadcast_heartbeat(&self) -> RaftResult<()> {
+    pub async fn broadcast_heartbeat(&self) -> RaftResult<()> {
         let heartbeat = {
             let state = self.state.lock().await;
             
@@ -232,7 +232,7 @@ impl<T: Transport + 'static, L: LogStore + 'static> RaftConsensus<T, L> {
         Ok(())
     }
 
-    async fn replicate_logs(&self) -> RaftResult<()> {
+    pub async fn replicate_logs(&self) -> RaftResult<()> {
         let (term, node_id) = {
             let state = self.state.lock().await;
             if state.role != NodeRole::Leader {
@@ -473,147 +473,13 @@ impl<T: Transport + 'static, L: LogStore + 'static> RaftConsensus<T, L> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use std::collections::HashMap;
     use std::sync::Arc;
     use tokio::sync::Mutex;
-    use crate::cluster::message::{LogEntry, RaftMessage};
+    use crate::cluster::{log_store::MockLogStore, message::{LogEntry, RaftMessage}, transport::MockTransport};
     //use async_trait::async_trait;
-
-    pub struct MockLogStore {
-        logs: Vec<LogEntry>,
-        committed_index: u64,
-        snapshots: Vec<Vec<u8>>,
-    }
-
-    impl MockLogStore {
-        pub fn new() -> Self {
-            MockLogStore {
-                logs: Vec::new(),
-                committed_index: 0,
-                snapshots: Vec::new(),
-            }
-        }
-    }
-
-    impl LogStore for MockLogStore {
-        fn append(&mut self, entries: Vec<LogEntry>) -> RaftResult<u64> {
-            self.logs.extend(entries);
-            Ok(self.logs.len() as u64)
-        }
-
-        fn get(&self, index: u64) -> RaftResult<Option<LogEntry>> {
-            if index == 0 || index > self.logs.len() as u64 {
-                return Ok(None);
-            }
-            Ok(self.logs.get(index as usize - 1).cloned())
-        }
-
-        fn get_range(&self, start: u64, end: u64) -> RaftResult<Vec<LogEntry>> {
-            if start == 0 || start > end || start > self.logs.len() as u64 {
-                return Ok(Vec::new());
-            }
-
-            let end_idx = std::cmp::min(end as usize, self.logs.len());
-            Ok(self.logs[(start - 1) as usize..end_idx].to_vec())
-        }
-
-        fn delete_from(&mut self, index: u64) -> RaftResult<()> {
-            if index <= self.logs.len() as u64 {
-                self.logs.truncate((index - 1) as usize);
-                if self.committed_index > self.logs.len() as u64 {
-                    self.committed_index = self.logs.len() as u64;
-                }
-            }
-            Ok(())
-        }
-
-        fn last_index(&self) -> RaftResult<u64> {
-            Ok(self.logs.len() as u64)
-        }
-
-        fn last_term(&self) -> RaftResult<u64> {
-            Ok(self.logs.last().map_or(0, |e| e.term))
-        }
-
-        fn commit(&mut self, index: u64) -> RaftResult<()> {
-            if index > self.logs.len() as u64 {
-                return Err(RaftError::LogNotFound(index));
-            }
-            self.committed_index = index;
-            Ok(())
-        }
-
-        fn committed_index(&self) -> RaftResult<u64> {
-            Ok(self.committed_index)
-        }
-
-        fn snapshot(&mut self) -> RaftResult<()> {
-            let snapshot_data = bincode::serialize(&self.logs)?;
-            self.snapshots.push(snapshot_data);
-            Ok(())
-        }
-
-        fn restore_snapshot(&mut self, data: Vec<u8>) -> RaftResult<()> {
-            self.logs = bincode::deserialize(&data)?;
-            self.committed_index = self.logs.len() as u64;
-            Ok(())
-        }
-    }
-
-    pub struct MockTransport {
-        node_id: String,
-        messages: Arc<Mutex<Vec<(String, RaftMessage)>>>,
-        msg_callback: Option<Arc<dyn Fn(RaftMessage) -> RaftResult<()> + Send + Sync>>,
-        connections: Arc<Mutex<HashMap<String, String>>>, // node_id -> addr
-    }
-
-    impl MockTransport {
-        pub fn new(node_id: String) -> Self {
-            MockTransport {
-                node_id,
-                messages: Arc::new(Mutex::new(Vec::new())),
-                msg_callback: None,
-                connections: Arc::new(Mutex::new(HashMap::new())),
-            }
-        }
-
-        pub fn set_callback(&mut self, callback: Arc<dyn Fn(RaftMessage) -> RaftResult<()> + Send + Sync>) {
-            self.msg_callback = Some(callback);
-        }
-
-        pub async fn get_messages(&self) -> Vec<(String, RaftMessage)> {
-            self.messages.lock().await.clone()
-        }
-    }
-
-    //#[async_trait]
-    impl Transport for MockTransport {
-        async fn send(&self, to: &str, msg: RaftMessage) -> RaftResult<()> {
-            self.messages.lock().await.push((to.to_string(), msg.clone()));
-        
-            if let Some(callback) = &self.msg_callback {
-                callback(msg)?;
-            }
-            
-            Ok(())
-        }
-
-        async fn start(&self) -> RaftResult<()> {
-            Ok(())
-        }
-
-        async fn add_node(&self, node_id: String, addr: String) -> RaftResult<()> {
-            self.connections.lock().await.insert(node_id, addr);
-            Ok(())
-        }
-
-        async fn remove_node(&self, node_id: &str) -> RaftResult<()> {
-            self.connections.lock().await.remove(node_id);
-            Ok(())
-        }
-    }
 
     async fn setup_consensus() -> (Arc<RaftConsensus<MockTransport, MockLogStore>>, Arc<MockTransport>) {
         let transport = Arc::new(MockTransport::new("node1".to_string()));

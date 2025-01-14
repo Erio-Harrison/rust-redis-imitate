@@ -156,3 +156,56 @@ impl Transport for RaftTransport {
         Ok(())
     }
 }
+
+pub struct MockTransport {
+    pub node_id: String,
+    pub messages: Arc<Mutex<Vec<(String, RaftMessage)>>>,
+    pub msg_callback: Option<Arc<dyn Fn(RaftMessage) -> RaftResult<()> + Send + Sync>>,
+    pub connections: Arc<Mutex<HashMap<String, String>>>, // node_id -> addr
+}
+
+impl MockTransport {
+    pub fn new(node_id: String) -> Self {
+        MockTransport {
+            node_id,
+            messages: Arc::new(Mutex::new(Vec::new())),
+            msg_callback: None,
+            connections: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+
+    pub fn set_callback(&mut self, callback: Arc<dyn Fn(RaftMessage) -> RaftResult<()> + Send + Sync>) {
+        self.msg_callback = Some(callback);
+    }
+
+    pub async fn get_messages(&self) -> Vec<(String, RaftMessage)> {
+        self.messages.lock().await.clone()
+    }
+}
+
+//#[async_trait]
+impl Transport for MockTransport {
+    async fn send(&self, to: &str, msg: RaftMessage) -> RaftResult<()> {
+        self.messages.lock().await.push((to.to_string(), msg.clone()));
+    
+        if let Some(callback) = &self.msg_callback {
+            callback(msg)?;
+        }
+        
+        Ok(())
+    }
+
+    async fn start(&self) -> RaftResult<()> {
+        Ok(())
+    }
+
+    async fn add_node(&self, node_id: String, addr: String) -> RaftResult<()> {
+        self.connections.lock().await.insert(node_id, addr);
+        Ok(())
+    }
+
+    async fn remove_node(&self, node_id: &str) -> RaftResult<()> {
+        self.connections.lock().await.remove(node_id);
+        Ok(())
+    }
+}

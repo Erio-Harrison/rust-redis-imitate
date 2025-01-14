@@ -222,6 +222,88 @@ impl LogStore for MemLogStore {
     }
 }
 
+
+pub struct MockLogStore {
+    pub logs: Vec<LogEntry>,
+    pub committed_index: u64,
+    pub snapshots: Vec<Vec<u8>>,
+}
+
+impl MockLogStore {
+    pub fn new() -> Self {
+        MockLogStore {
+            logs: Vec::new(),
+            committed_index: 0,
+            snapshots: Vec::new(),
+        }
+    }
+}
+
+impl LogStore for MockLogStore {
+    fn append(&mut self, entries: Vec<LogEntry>) -> RaftResult<u64> {
+        self.logs.extend(entries);
+        Ok(self.logs.len() as u64)
+    }
+
+    fn get(&self, index: u64) -> RaftResult<Option<LogEntry>> {
+        if index == 0 || index > self.logs.len() as u64 {
+            return Ok(None);
+        }
+        Ok(self.logs.get(index as usize - 1).cloned())
+    }
+
+    fn get_range(&self, start: u64, end: u64) -> RaftResult<Vec<LogEntry>> {
+        if start == 0 || start > end || start > self.logs.len() as u64 {
+            return Ok(Vec::new());
+        }
+
+        let end_idx = std::cmp::min(end as usize, self.logs.len());
+        Ok(self.logs[(start - 1) as usize..end_idx].to_vec())
+    }
+
+    fn delete_from(&mut self, index: u64) -> RaftResult<()> {
+        if index <= self.logs.len() as u64 {
+            self.logs.truncate((index - 1) as usize);
+            if self.committed_index > self.logs.len() as u64 {
+                self.committed_index = self.logs.len() as u64;
+            }
+        }
+        Ok(())
+    }
+
+    fn last_index(&self) -> RaftResult<u64> {
+        Ok(self.logs.len() as u64)
+    }
+
+    fn last_term(&self) -> RaftResult<u64> {
+        Ok(self.logs.last().map_or(0, |e| e.term))
+    }
+
+    fn commit(&mut self, index: u64) -> RaftResult<()> {
+        if index > self.logs.len() as u64 {
+            return Err(RaftError::LogNotFound(index));
+        }
+        self.committed_index = index;
+        Ok(())
+    }
+
+    fn committed_index(&self) -> RaftResult<u64> {
+        Ok(self.committed_index)
+    }
+
+    fn snapshot(&mut self) -> RaftResult<()> {
+        let snapshot_data = bincode::serialize(&self.logs)?;
+        self.snapshots.push(snapshot_data);
+        Ok(())
+    }
+
+    fn restore_snapshot(&mut self, data: Vec<u8>) -> RaftResult<()> {
+        self.logs = bincode::deserialize(&data)?;
+        self.committed_index = self.logs.len() as u64;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

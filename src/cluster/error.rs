@@ -30,6 +30,12 @@ pub enum RaftError {
     
     #[error("State error: {0}")]
     State(String),
+
+    #[error("Not leader")]
+    NotLeader,
+
+    #[error("Time is out")]
+    ReplicationTimeout,
 }
 
 pub type RaftResult<T> = Result<T, RaftError>;
